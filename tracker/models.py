@@ -6,7 +6,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class Income(models.Models):
+class Income(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null = True)
@@ -16,7 +16,7 @@ class Income(models.Models):
     def __str__(self):
         return f'{self.amount} - {self.category}'
     
-class Expense(models.Models):
+class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null = True)
