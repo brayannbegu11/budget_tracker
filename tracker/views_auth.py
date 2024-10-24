@@ -2,7 +2,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import UserSerializer
@@ -10,18 +10,22 @@ from .serializers import UserSerializer
 
     
 class RegisterView(APIView):
+    permission_classes = [AllowAny]  
     authentication_classes = [JWTAuthentication]
-    permission_classes = [AllowAny]
-    print('here is working')
+    
+
     def post(self, request):
-        print('here is working')
-        serializer = UserSerializer(data=request.data) #Convert JSON to Python
-        print('Is it here')
+        serializer = UserSerializer(data=request.data)  # Convert JSON to Python
         if serializer.is_valid():
             user = serializer.save()
-            return Response({'user':serializer.data}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
+            # Generate JWT tokens for the new user
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user': serializer.data, 
+                'token': str(refresh),  # Return JWT refresh token
+                'access': str(refresh.access_token) 
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny] #Anyone can access
@@ -45,3 +49,12 @@ class LoginView(APIView):
                 }
             })
         return Response({'detail': 'Invalid credentials'}, status = status.HTTP_401_UNAUTHORIZED)
+
+class UserView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response({'user': serializer.data})
