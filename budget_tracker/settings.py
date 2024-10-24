@@ -39,7 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tracker',
     'rest_framework',
+    'rest_framework_simplejwt'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework_simplejwt.authentication.JWTAuthentication' #Authenticate users using JWT tokens instead of other methods.
+    )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
