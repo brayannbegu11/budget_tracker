@@ -1,11 +1,13 @@
 import axios from "axios"
 import React, { createContext, useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const AuthContext = createContext()
 
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const  fetchUser = async () => {
@@ -26,9 +28,19 @@ export const AuthProvider = ({children}) => {
     }, [])
 
     const login = async(credentials) => {
-        const res = await axios.post('https://127.0.0.1:8000/api/login', credentials)
-        localStorage.setItem('token', res.data.token)
-        setUser(res.data.user)
+        try {
+            console.log(credentials)
+            const res = await axios.post('http://127.0.0.1:8000/api/login/', credentials)
+            if (res.status !== 200){
+                console.log('Invalid credentials')
+                return
+            }
+            localStorage.setItem('token', res.data.refresh)
+            setUser(res.data.user)
+            navigate('/dashboard')
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const logout = () => {

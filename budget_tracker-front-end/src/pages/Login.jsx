@@ -11,7 +11,7 @@ export const Login = () => {
     }
 
     const handleSubmit = async(e) => {
-        e.prevent.default()
+        e.preventDefault()
         await (login(credentials))
     }
   return (

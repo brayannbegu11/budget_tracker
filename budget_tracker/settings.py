@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tracker',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    "corsheaders"
 ]
 
 REST_FRAMEWORK = {
@@ -57,6 +58,7 @@ REST_FRAMEWORK = {
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,6 +84,10 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
 
 WSGI_APPLICATION = 'budget_tracker.wsgi.application'
