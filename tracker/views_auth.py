@@ -1,33 +1,31 @@
-from rest_framework import serializers, status
+from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .serializers import UserSerializer
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {'password' : {'write_only': True}} #password is write-only
-    def create(self, validated_data):
-        user = User(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+
     
 class RegisterView(APIView):
-    permission_classes = [AllowAny] #Anyone can access
-    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+    print('here is working')
     def post(self, request):
+        print('here is working')
         serializer = UserSerializer(data=request.data) #Convert JSON to Python
+        print('Is it here')
         if serializer.is_valid():
-            serializer.save()#Save new user
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response({'user':serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny] #Anyone can access
+    
     
     def post(self, request):
         username = request.data.get('username')
